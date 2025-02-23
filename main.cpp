@@ -18,6 +18,7 @@ struct spell {
 };
 
 
+// Function to open a file and check if it opened correctly
 ifstream checkFile(string fileName) {
 	ifstream file(fileName);
 
@@ -30,6 +31,7 @@ ifstream checkFile(string fileName) {
 }
 
 
+// Function to get the quantity of spells from the file
 int getSpellsQuantity(ifstream &file) {
 	string spellsLine = "";
 	// It has to be the first function to be called to get the quantity correctly
@@ -44,6 +46,7 @@ int getSpellsQuantity(ifstream &file) {
 }
 
 
+// Recursive function to get the list of suspects from the file (Yeah, I'm kind of a genius)
 void getSuspectsList(ifstream &file, string* &suspects, int &suspectsQuantity, int index = 0) {
     if (file.eof()) {
 		suspectsQuantity--;
@@ -64,12 +67,15 @@ void getSuspectsList(ifstream &file, string* &suspects, int &suspectsQuantity, i
 
 
 int main(int argc, char *argv[]) {
+	// Open spell and suspect files
 	ifstream spellFile = checkFile("spellList.in");
 	ifstream suspectFile = checkFile("underInvestigation.in");
 
+    // Get the quantity of spells
     int spellsQuantity = getSpellsQuantity(spellFile);
 	spell spells[spellsQuantity];
 
+	// Get the list of suspects
 	string* suspects = nullptr;
 	int suspectsQuantity = 0;
 	getSuspectsList(suspectFile, suspects, suspectsQuantity);
