@@ -4,6 +4,11 @@
 
 using namespace std;
 
+struct magician {
+	string name = "Jhon";
+	bool isIlegal = false;
+};
+
 // Function to open a file and check if it opened correctly
 ifstream checkFile(string fileName) {
 	ifstream file(fileName);
@@ -33,10 +38,10 @@ int getSpellsQuantity(ifstream &file) {
 
 
 // Recursive function to get the list of suspects from the file (Yeah, I'm kind of a genius)
-void getSuspectsList(ifstream &file, string* &suspects, int &suspectsQuantity, int index = 0) {
+void getSuspectsList(ifstream &file, magician* &suspects, int &suspectsQuantity, int index = 0) {
     if (file.eof()) {
 		suspectsQuantity--;
-        suspects = new string[suspectsQuantity];
+        suspects = new magician[suspectsQuantity];
         return;
     }
 
@@ -47,7 +52,7 @@ void getSuspectsList(ifstream &file, string* &suspects, int &suspectsQuantity, i
     getSuspectsList(file, suspects, suspectsQuantity, index + 1);
 
 	if (index < suspectsQuantity) {
-		suspects[index] = suspectLine;
+		suspects[index].name = suspectLine;
 	}
 }
 
@@ -55,22 +60,27 @@ void getSuspectsList(ifstream &file, string* &suspects, int &suspectsQuantity, i
 void readSpellList(ifstream &file, graph spells[], int spellsQuantity) {
 	string wizardName, vertexTypes;
 	int vertexQuantity, edgesQuantity, from, to, weight;
+	char vertex;
 
     for (int i = 0; i < spellsQuantity; ++i) {
         getline(file, wizardName);
 		spells[i].suspectName = wizardName;
 
         file >> vertexQuantity;
-        file >> vertexTypes;
+		file.ignore();
+		getline(file, vertexTypes);
 
         for (int j = 0; j < vertexQuantity; ++j) {
-            spells[i].addVertex(j + 1, vertexTypes[j]);
+			vertex = (vertexTypes[j] != ' ')? vertexTypes[j]: '0';
+            spells[i].addVertex(j + 1, vertex);
         }
 
         file >> edgesQuantity;
+		file.ignore();
 
         for (int j = 0; j < edgesQuantity; ++j) {
             file >> from >> to >> weight;
+			file.ignore();
             spells[i].addEdge(from, to, weight);
         }
     }
@@ -83,7 +93,7 @@ int main(int argc, char *argv[]) {
 	ifstream suspectFile = checkFile("../build/underInvestigation.in");
 
 	// Get the list of suspects
-	string* suspects = nullptr;
+	magician* suspects = nullptr;
 	int suspectsQuantity = 0;
 	getSuspectsList(suspectFile, suspects, suspectsQuantity);
 
@@ -93,6 +103,7 @@ int main(int argc, char *argv[]) {
     graph spells[spellsQuantity];
     readSpellList(spellFile, spells, spellsQuantity);
     spells[0].print();
+    spells[1].print();
 
     spellFile.close();
     suspectFile.close();
