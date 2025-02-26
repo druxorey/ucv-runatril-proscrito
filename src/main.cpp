@@ -87,6 +87,19 @@ void readSpellList(ifstream &file, graph spells[], int spellsQuantity) {
 }
 
 
+void isSpellsValid(graph spells[], int spellsQuantity) {
+	int cofluencyCounter = 0;
+	for (int i = 0; i < spellsQuantity; i++) {
+		vertex* v = spells->vertices;
+		for (int j = 0; j < spells[i].vertexQuantity; j++) {
+			if (v->type == 'A') cofluencyCounter++;
+			v = v->next;
+		}
+		if (cofluencyCounter > 1) cout << "NO FURULA" << endl;
+	}
+}
+
+
 int main(int argc, char *argv[]) {
 	// Open spell and suspect files
 	ifstream spellFile = checkFile("../build/spellList.in");
@@ -103,7 +116,11 @@ int main(int argc, char *argv[]) {
     graph spells[spellsQuantity];
     readSpellList(spellFile, spells, spellsQuantity);
     spells[0].print();
-    spells[1].print();
+
+	//
+	isSpellsValid(spells, spellsQuantity);
+
+	cout << suspects[0].isIlegal << endl;
 
     spellFile.close();
     suspectFile.close();
