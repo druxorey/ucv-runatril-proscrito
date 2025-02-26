@@ -25,6 +25,7 @@ class vertex {
 class graph {
     public:
         vertex* vertices;  // Pointer to the first vertex in the vertex list
+		string suspectName;
 
         // Constructor to initialize an empty graph
         graph() : vertices(nullptr) {}
@@ -74,6 +75,7 @@ void graph::addEdge(const int& from, const int& to, int weight, char type) {
 // Method to print the graph
 void graph::print() {
     vertex* v = vertices;  // Start from the first vertex
+	printf("\nSuspect \e[0;34m%s\e[0m has the following connections:\n\n", suspectName.c_str());
     while (v) {
 		printf("\e[0;32mVertex %d\e[0m connects to:\n", v->name);
         edge* e = v->edgeList;  // Get the edge list of the current vertex
