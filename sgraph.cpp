@@ -75,10 +75,10 @@ void graph::addEdge(const int& from, const int& to, int weight, char type) {
 void graph::print() {
     vertex* v = vertices;  // Start from the first vertex
     while (v) {
-        cout << "Vertex " << v->name << " connects to:\n";
+		printf("\e[0;32mVertex %d\e[0m connects to:\n", v->name);
         edge* e = v->edgeList;  // Get the edge list of the current vertex
         while (e) {
-            cout << "  Vertex with weight " << e->weight << " and type " << e->type << "\n";
+			printf(" - Vertex with weight \e[0;33m%d\e[0m and type \e[0;33m%c\e[0m\n", e->weight, e->type);
             e = e->next;  // Move to the next edge in the adjacency list
         }
         v = v->next;  // Move to the next vertex in the vertex list
