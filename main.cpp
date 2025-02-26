@@ -54,8 +54,7 @@ void getSuspectsList(ifstream &file, string* &suspects, int &suspectsQuantity, i
 // Function to read the spell list from the file
 void readSpellList(ifstream &file, graph spells[], int spellsQuantity) {
 	string wizardName, vertexTypes;
-	int vertexQuantity, edgesQuantity, from, to;
-	double weight;
+	int vertexQuantity, edgesQuantity, from, to, weight;
 
     for (int i = 0; i < spellsQuantity; ++i) {
         getline(file, wizardName);
@@ -65,14 +64,14 @@ void readSpellList(ifstream &file, graph spells[], int spellsQuantity) {
         file >> vertexTypes;
 
         for (int j = 0; j < vertexQuantity; ++j) {
-            spells[i].addVertex(j + 1);
+            spells[i].addVertex(j + 1, vertexTypes[j]);
         }
 
         file >> edgesQuantity;
 
         for (int j = 0; j < edgesQuantity; ++j) {
             file >> from >> to >> weight;
-            spells[i].addEdge(from, to, weight, vertexTypes[from - 1]);
+            spells[i].addEdge(from, to, weight);
         }
     }
 }
