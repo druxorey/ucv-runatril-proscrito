@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include "sgraph.cpp"
+#include "../lib/graph.cpp"
 
 using namespace std;
 
@@ -79,8 +79,8 @@ void readSpellList(ifstream &file, graph spells[], int spellsQuantity) {
 
 int main(int argc, char *argv[]) {
 	// Open spell and suspect files
-	ifstream spellFile = checkFile("spellList.in");
-	ifstream suspectFile = checkFile("underInvestigation.in");
+	ifstream spellFile = checkFile("../build/spellList.in");
+	ifstream suspectFile = checkFile("../build/underInvestigation.in");
 
 	// Get the list of suspects
 	string* suspects = nullptr;
