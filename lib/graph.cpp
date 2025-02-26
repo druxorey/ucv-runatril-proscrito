@@ -27,6 +27,7 @@ class graph {
     public:
         vertex* vertices;  // Pointer to the first vertex in the vertex list
 		string suspectName;
+		int vertexQuantity = 0;
 
         // Constructor to initialize an empty graph
         graph() : vertices(nullptr) {}
@@ -54,6 +55,7 @@ void graph::addVertex(const int &name, const char &type) {
     vertex* newVertex = new vertex(name, type);  // Create a new vertex
     newVertex->next = vertices;  // Point the new vertex to the current first vertex
     vertices = newVertex;  // Update the vertices pointer to the new vertex
+	vertexQuantity++;
 }
 
 // Method to add an edge between two vertices
