@@ -9,6 +9,27 @@ struct magician {
 	int ilegalSpells = 0;
 };
 
+// START OF DEBUG FUNCTIONS
+
+void printGraphs(graph list[], int size) {
+	for (int i = 0; i < size; i++) {
+		list[i].print();
+	}
+}
+
+
+void printSuspectThings(magician suspects[], int size) {
+	printf("\n");
+	for (int i = 0; i < size; i++) {
+		cout << "Name: " << suspects[i].name << '\n';
+		cout << "Ilegal spells: " << suspects[i].ilegalSpells << '\n';
+		printf("\n");
+	}
+}
+
+
+// END OF DEBUG FUNCTIONS
+
 // Function to open a file and check if it opened correctly
 ifstream checkFile(string fileName) {
 	ifstream file(fileName);
@@ -125,10 +146,6 @@ void isSpellsValid(graph spells[], magician suspects[], int spellsQuantity, int 
 				}
 			}
 		}
-
-
-
-
 	}
 }
 
@@ -151,6 +168,10 @@ int main(int argc, char *argv[]) {
 
 	// Check if the spells are valid duh
 	isSpellsValid(spells, suspects, spellsQuantity, suspectsQuantity);
+
+	// Just debug stuff
+	printGraphs(spells, spellsQuantity);
+	printSuspectThings(suspects, suspectsQuantity);
 
     spellFile.close();
     suspectFile.close();
