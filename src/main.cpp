@@ -67,11 +67,11 @@ void readSpellList(ifstream &file, graph spells[], int spellsQuantity) {
 		spells[i].suspectName = wizardName;
 
         file >> vertexQuantity;
-		file.ignore();
+		file.ignore(); // Shitty C++ getline bug [ actually it's not a bug, it's a feature :) ]
 		getline(file, vertexTypes);
 
         for (int j = 0; j < vertexQuantity; ++j) {
-			vertex = (vertexTypes[j] != ' ')? vertexTypes[j]: '0';
+			vertex = (vertexTypes[j] != ' ')? vertexTypes[j]: '0'; // I asume that the vertex type is '0' if it's not specified
             spells[i].addVertex(j + 1, vertex);
         }
 
@@ -86,16 +86,33 @@ void readSpellList(ifstream &file, graph spells[], int spellsQuantity) {
     }
 }
 
-
+// To know if the spells are valid (no shit sherlock)
 void isSpellsValid(graph spells[], int spellsQuantity) {
-	int cofluencyCounter = 0;
+	int cofluencyCounter = 0, elementalRunes = 0;
+
 	for (int i = 0; i < spellsQuantity; i++) {
 		vertex* v = spells->vertices;
+
 		for (int j = 0; j < spells[i].vertexQuantity; j++) {
-			if (v->type == 'A') cofluencyCounter++;
+
+			switch (v->type) {
+				case 'A': cofluencyCounter++; break;
+				case 'I': elementalRunes++; break;
+				case 'Q': elementalRunes++; break;
+				case 'T': elementalRunes++; break;
+				case 'V': elementalRunes++; break;
+				case 'L': elementalRunes++; break;
+				case 'O': elementalRunes++; break;
+				case 'F': break;
+				case 'B': break;
+				case 'D': break;
+				default: cout << "\n\e[0;31mSomething really bad happened, check your elementals runes...\e[0m\n"; break;
+			}
+
 			v = v->next;
 		}
-		if (cofluencyCounter > 1) cout << "NO FURULA" << endl;
+		if (cofluencyCounter > 1) cout << "\n\e[0;31mERROR: Cofluency counter exceeded the limit\e[0m\n";
+		if (elementalRunes > 3) cout << "\n\e[0;31mERROR: Elemental runes exceeded the limit\e[0m\n";
 	}
 }
 
@@ -115,11 +132,12 @@ int main(int argc, char *argv[]) {
 
     graph spells[spellsQuantity];
     readSpellList(spellFile, spells, spellsQuantity);
-    spells[0].print();
 
-	//
+	// Check if the spells are valid duh
 	isSpellsValid(spells, spellsQuantity);
 
+	// Just for testing things
+    spells[0].print();
 	cout << suspects[0].isIlegal << endl;
 
     spellFile.close();
