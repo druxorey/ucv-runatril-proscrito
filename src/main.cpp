@@ -113,10 +113,9 @@ void isSpellsValid(graph spells[], magician suspects[], int spellsQuantity, int 
 	for (int i = 0; i < spellsQuantity; i++) {
 		int cofluencyCounter = 0, elementalRunes = 0;
 		string magicianName = spells[i].suspectName;
-		vertex* v = spells->vertices;
+		vertex* v = spells[i].vertices;
 
 		for (int j = 0; j < spells[i].vertexQuantity; j++) {
-
 			switch (v->type) {
 				case 'A': cofluencyCounter++; break;
 				case 'I': elementalRunes++; break;
