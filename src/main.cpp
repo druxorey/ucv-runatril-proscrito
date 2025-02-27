@@ -6,7 +6,7 @@ using namespace std;
 
 struct magician {
 	string name = "Jhon";
-	bool isIlegal = false;
+	int ilegalSpells = 0;
 };
 
 // Function to open a file and check if it opened correctly
@@ -87,10 +87,11 @@ void readSpellList(ifstream &file, graph spells[], int spellsQuantity) {
 }
 
 // To know if the spells are valid (no shit sherlock)
-void isSpellsValid(graph spells[], int spellsQuantity) {
-	int cofluencyCounter = 0, elementalRunes = 0;
+void isSpellsValid(graph spells[], magician suspects[], int spellsQuantity, int suspectsQuantity) {
 
 	for (int i = 0; i < spellsQuantity; i++) {
+		int cofluencyCounter = 0, elementalRunes = 0;
+		string magicianName = spells[i].suspectName;
 		vertex* v = spells->vertices;
 
 		for (int j = 0; j < spells[i].vertexQuantity; j++) {
@@ -111,8 +112,23 @@ void isSpellsValid(graph spells[], int spellsQuantity) {
 
 			v = v->next;
 		}
-		if (cofluencyCounter > 1) cout << "\n\e[0;31mERROR: Cofluency counter exceeded the limit\e[0m\n";
-		if (elementalRunes > 3) cout << "\n\e[0;31mERROR: Elemental runes exceeded the limit\e[0m\n";
+
+		for (int k = 0; k < suspectsQuantity; k++) {
+			if (suspects[k].name == magicianName) {
+				if (cofluencyCounter > 1) {
+					suspects[k].ilegalSpells++;
+					cout << "\n\e[0;31mERROR: Cofluency counter exceeded the limit\e[0m\n";
+				}
+				if (elementalRunes > 3) {
+					suspects[k].ilegalSpells++;
+					cout << "\n\e[0;31mERROR: Elemental runes exceeded the limit\e[0m\n";
+				}
+			}
+		}
+
+
+
+
 	}
 }
 
@@ -134,11 +150,7 @@ int main(int argc, char *argv[]) {
     readSpellList(spellFile, spells, spellsQuantity);
 
 	// Check if the spells are valid duh
-	isSpellsValid(spells, spellsQuantity);
-
-	// Just for testing things
-    spells[0].print();
-	cout << suspects[0].isIlegal << endl;
+	isSpellsValid(spells, suspects, spellsQuantity, suspectsQuantity);
 
     spellFile.close();
     suspectFile.close();
