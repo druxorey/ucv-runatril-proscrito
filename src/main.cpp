@@ -27,7 +27,6 @@ void printSuspectThings(magician suspects[], int size) {
 	}
 }
 
-
 // END OF DEBUG FUNCTIONS
 
 // Function to open a file and check if it opened correctly
@@ -42,7 +41,6 @@ ifstream checkFile(string fileName) {
 	return file;
 }
 
-
 // Function to get the quantity of spells from the file
 int getSpellsQuantity(ifstream &file) {
 	string spellsLine = "";
@@ -56,7 +54,6 @@ int getSpellsQuantity(ifstream &file) {
 	}
 	return spellsQuantity;
 }
-
 
 // Recursive function to get the list of suspects from the file (Yeah, I'm kind of a genius)
 void getSuspectsList(ifstream &file, magician* &suspects, int &suspectsQuantity, int index = 0) {
@@ -134,15 +131,15 @@ void isSpellsValid(graph spells[], magician suspects[], int spellsQuantity, int 
 		}
 
 		for (int k = 0; k < suspectsQuantity; k++) {
-			if (suspects[k].name == magicianName) {
-				if (cofluencyCounter > 1) {
-					suspects[k].ilegalSpells++;
-					cout << "\n\e[0;31mERROR: Cofluency counter exceeded the limit\e[0m\n";
-				}
-				if (elementalRunes > 3) {
-					suspects[k].ilegalSpells++;
-					cout << "\n\e[0;31mERROR: Elemental runes exceeded the limit\e[0m\n";
-				}
+			if (suspects[k].name != magicianName) continue;
+
+			if (cofluencyCounter > 1) {
+				suspects[k].ilegalSpells++;
+				cout << "\n\e[0;31mERROR: Cofluency counter exceeded the limit\e[0m\n";
+			}
+			if (elementalRunes > 3) {
+				suspects[k].ilegalSpells++;
+				cout << "\n\e[0;31mERROR: Elemental runes exceeded the limit\e[0m\n";
 			}
 		}
 	}
