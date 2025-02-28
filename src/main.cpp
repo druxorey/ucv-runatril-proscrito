@@ -110,9 +110,19 @@ void isSpellsValid(graph spells[], magician suspects[], int spellsQuantity, int 
 	for (int i = 0; i < spellsQuantity; i++) {
 		int cofluencyCounter = 0, elementalRunes = 0;
 		string magicianName = spells[i].suspectName;
+		bool isEnergeticRune = true;
+
 		vertex* v = spells[i].vertices;
 
+
 		for (int j = 0; j < spells[i].vertexQuantity; j++) {
+			if (v->name == 1) {
+				string adjacentTypes = spells[i].getAdjacentTypes(v);
+				for (int p = 0; p < adjacentTypes.length(); p++) {
+					if (adjacentTypes[i] != 'B') isEnergeticRune = false;
+				}
+			}
+
 			switch (v->type) {
 				case 'A': cofluencyCounter++; break;
 				case 'I': elementalRunes++; break;
@@ -140,6 +150,10 @@ void isSpellsValid(graph spells[], magician suspects[], int spellsQuantity, int 
 			if (elementalRunes > 3) {
 				suspects[k].ilegalSpells++;
 				cout << "\n\e[0;31mERROR: Elemental runes exceeded the limit\e[0m\n";
+			}
+			if (!isEnergeticRune) {
+				suspects[k].ilegalSpells++;
+				cout << "\n\e[0;31mERROR: Energetic runes exceeded the limit\e[0m\n";
 			}
 		}
 	}
