@@ -14,6 +14,7 @@ class edge {
 
 class vertex {
     public:
+		int adjacentVertex = 0;
         int name;
         char type;
         edge* edgeList;
@@ -34,6 +35,7 @@ class graph {
 
         void addVertex(const int& name, const char& type);
         void addEdge(const int& from, const int& to, int weight);
+		string getAdjacentTypes(vertex* v);
         void print();
 
     private:
@@ -67,11 +69,13 @@ void graph::addEdge(const int& from, const int& to, int weight) {
         edge* newEdge = new edge(weight, to);  // Create a new edge
         newEdge->next = fromVertex->edgeList;  // Point the new edge to the current edge list of the source vertex
         fromVertex->edgeList = newEdge;  // Update the edge list of the source vertex
+		fromVertex->adjacentVertex++;
 
         // Since the graph is undirected, add the edge in the opposite direction as well
         newEdge = new edge(weight, from);  // Create another edge for the opposite direction
         newEdge->next = toVertex->edgeList;  // Point the new edge to the current edge list of the destination vertex
         toVertex->edgeList = newEdge;  // Update the edge list of the destination vertex
+		toVertex->adjacentVertex++;
     }
 }
 
@@ -91,4 +95,17 @@ void graph::print() {
         }
         v = v->next;  // Move to the next vertex in the vertex list
     }
+}
+
+// Get the types of the adjacent vertices
+string graph::getAdjacentTypes(vertex* v) {
+	string adjacentTypes = "";
+	edge* e = v->edgeList;  // Get the edge list of the current vertex
+	for (int i = 0; i < v->adjacentVertex; i++) {
+		vertex* connectedVertex = findVertex(e->to);  // Find the connected vertex by edge weight
+		if (connectedVertex) adjacentTypes += connectedVertex->type;
+		e = e->next;  // Move to the next edge in the adjacency list
+	}
+
+	return adjacentTypes;
 }
