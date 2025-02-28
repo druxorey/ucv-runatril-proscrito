@@ -14,24 +14,24 @@ class edge {
 
 class vertex {
     public:
-		int adjacentVertex = 0;
-        int name;
+        int value;
         char type;
         edge* edgeList;
         vertex* next;  // Pointer to the next vertex in the vertex list
+		int adjacentVertex;
 
         // Constructor to initialize a vertex with a name
-        vertex(int n, char t) : name(n), type(t), edgeList(nullptr), next(nullptr) {}
+        vertex(int n, char t) : value(n), type(t), edgeList(nullptr), next(nullptr), adjacentVertex(0) {}
 };
 
 class graph {
     public:
         vertex* vertices;  // Pointer to the first vertex in the vertex list
-		string suspectName;
-		int vertexQuantity = 0;
+		string suspectName;  // Hes just Master Chief
+		int vertexQuantity;
 
         // Constructor to initialize an empty graph
-        graph() : vertices(nullptr) {}
+        graph() : vertices(nullptr), suspectName("Jhon"), vertexQuantity(0) {}
 
         void addVertex(const int& name, const char& type);
         void addEdge(const int& from, const int& to, int weight);
@@ -46,7 +46,7 @@ class graph {
 vertex* graph::findVertex(const int& name) {
     vertex* v = vertices;  // Start from the first vertex
     while (v) {
-        if (v->name == name) return v;  // Return the vertex if found
+        if (v->value == name) return v;  // Return the vertex if found
         v = v->next;  // Move to the next vertex in the list
     }
     return nullptr;  // Return nullptr if the vertex is not found
@@ -81,30 +81,32 @@ void graph::addEdge(const int& from, const int& to, int weight) {
 
 // Method to print the graph
 void graph::print() {
-    vertex* v = vertices;  // Start from the first vertex
+    vertex* actualVertex = vertices;  // Start from the first vertex
 	printf("\nSuspect \e[0;34m%s\e[0m has the following connections:\n\n", suspectName.c_str());
-    while (v) {
-		printf("\e[0;32mVertex %d\e[0m with type \e[0;32m%c\e[0m connects to:\n", v->name, v->type);
-        edge* e = v->edgeList;  // Get the edge list of the current vertex
-        while (e) {
-			vertex* connectedVertex = findVertex(e->to);  // Find the connected vertex by edge weight
-			if (connectedVertex) {
-				printf("    \e[0;33mVertex %d\e[0m with type \e[0;33m%c\e[0m through edge with weight \e[0;33m%d\e[0m\n", connectedVertex->name, connectedVertex->type, e->weight);
-			}
-			e = e->next;  // Move to the next edge in the adjacency list
+
+    while (actualVertex) {
+		printf("\e[0;32mVertex %d\e[0m with type \e[0;32m%c\e[0m connects to:\n", actualVertex->value, actualVertex->type);
+        edge* actualEdge = actualVertex->edgeList;  // Get the edge list of the current vertex
+
+        while (actualEdge) {
+			vertex* connectedVertex = findVertex(actualEdge->to);  // Find the connected vertex by edge weight
+			if (connectedVertex) printf("    \e[0;33mVertex %d\e[0m with type \e[0;33m%c\e[0m through edge with weight \e[0;33m%d\e[0m\n", connectedVertex->value, connectedVertex->type, actualEdge->weight);
+			actualEdge = actualEdge->next;  // Move to the next edge in the adjacency list
         }
-        v = v->next;  // Move to the next vertex in the vertex list
+        actualVertex = actualVertex->next;  // Move to the next vertex in the vertex list
     }
 }
 
 // Get the types of the adjacent vertices
-string graph::getAdjacentTypes(vertex* v) {
+string graph::getAdjacentTypes(vertex* actualVertex) {
 	string adjacentTypes = "";
-	edge* e = v->edgeList;  // Get the edge list of the current vertex
-	for (int i = 0; i < v->adjacentVertex; i++) {
-		vertex* connectedVertex = findVertex(e->to);  // Find the connected vertex by edge weight
+	edge* actualEdge = actualVertex->edgeList;  // Get the edge list of the current vertex
+
+	for (int i = 0; i < actualVertex->adjacentVertex; i++) {
+		vertex* connectedVertex = findVertex(actualEdge->to);  // Find the connected vertex by edge weight
 		if (connectedVertex) adjacentTypes += connectedVertex->type;
-		e = e->next;  // Move to the next edge in the adjacency list
+
+		actualEdge = actualEdge->next;  // Move to the next edge in the adjacency list
 	}
 
 	return adjacentTypes;
