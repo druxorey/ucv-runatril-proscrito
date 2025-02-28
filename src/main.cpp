@@ -4,6 +4,9 @@
 
 using namespace std;
 
+const short MAX_COFLUENCY = 1;
+const short MAX_ELEMENTALS = 3;
+
 struct magician {
 	string name = "Jhon";
 	int ilegalSpells = 0;
@@ -105,55 +108,60 @@ void readSpellList(ifstream &file, graph spells[], int spellsQuantity) {
 }
 
 // To know if the spells are valid (no shit sherlock)
-void isSpellsValid(graph spells[], magician suspects[], int spellsQuantity, int suspectsQuantity) {
+void checkSpell(graph spells[], int spellIterator, int &cofluencyCounter, int &elementalsCounter, bool &isEnergeticRune) {
+	vertex* actualRune = spells[spellIterator].vertices;
 
-	for (int i = 0; i < spellsQuantity; i++) {
-		int cofluencyCounter = 0, elementalRunes = 0;
-		string magicianName = spells[i].suspectName;
-		bool isEnergeticRune = true;
+	for (int runeIterator = 0; runeIterator < spells[spellIterator].vertexQuantity; runeIterator++) {
 
-		vertex* v = spells[i].vertices;
-
-
-		for (int j = 0; j < spells[i].vertexQuantity; j++) {
-			if (v->name == 1) {
-				string adjacentTypes = spells[i].getAdjacentTypes(v);
-				for (int p = 0; p < adjacentTypes.length(); p++) {
-					if (adjacentTypes[i] != 'B') isEnergeticRune = false;
-				}
-			}
-
-			switch (v->type) {
-				case 'A': cofluencyCounter++; break;
-				case 'I': elementalRunes++; break;
-				case 'Q': elementalRunes++; break;
-				case 'T': elementalRunes++; break;
-				case 'V': elementalRunes++; break;
-				case 'L': elementalRunes++; break;
-				case 'O': elementalRunes++; break;
-				case 'F': break;
-				case 'B': break;
-				case 'D': break;
-				default: cout << "\n\e[0;31mSomething really bad happened, check your elementals runes...\e[0m\n"; break;
-			}
-
-			v = v->next;
+		switch (actualRune->type) {
+			case 'A': cofluencyCounter++; break;
+			case 'I': elementalsCounter++; break;
+			case 'Q': elementalsCounter++; break;
+			case 'T': elementalsCounter++; break;
+			case 'V': elementalsCounter++; break;
+			case 'L': elementalsCounter++; break;
+			case 'O': elementalsCounter++; break;
+			case 'F': break;
+			case 'B': break;
+			case 'D': break;
+			default: cout << "\n\e[0;31mSomething really bad happened, check your elementals runes...\e[0m\n"; break;
 		}
 
-		for (int k = 0; k < suspectsQuantity; k++) {
-			if (suspects[k].name != magicianName) continue;
+		if (actualRune->next != nullptr) actualRune = actualRune->next;
+	}
 
-			if (cofluencyCounter > 1) {
-				suspects[k].ilegalSpells++;
-				cout << "\n\e[0;31mERROR: Cofluency counter exceeded the limit\e[0m\n";
+	string adjacentTypes = spells[spellIterator].getAdjacentTypes(actualRune);
+	for (int adjacentIterator = 0; adjacentIterator < adjacentTypes.length(); adjacentIterator++) {
+		if (adjacentTypes[spellIterator] != 'B') isEnergeticRune = false;
+	}
+}
+
+// To know if the magicians are ilegal
+void getIlegalMagicians(graph spells[], magician suspects[], int spellsQuantity, int suspectsQuantity) {
+
+	for (int spellIterator = 0; spellIterator < spellsQuantity; spellIterator++) {
+		int cofluencyCounter = 0, elementalsCounter = 0;
+		string magicianName = spells[spellIterator].suspectName;
+		bool isEnergeticRune = true;
+
+		checkSpell(spells, spellIterator, cofluencyCounter, elementalsCounter, isEnergeticRune);
+
+		for (int suspectIterator = 0; suspectIterator < suspectsQuantity; suspectIterator++) {
+			if (suspects[suspectIterator].name != magicianName) continue;
+
+			if (cofluencyCounter > MAX_COFLUENCY) {
+				suspects[suspectIterator].ilegalSpells++;
+				printf("\n\e[0;31mERROR: [%s] Cofluency counter exceeded the limit\e[0m\n", magicianName.c_str());
 			}
-			if (elementalRunes > 3) {
-				suspects[k].ilegalSpells++;
-				cout << "\n\e[0;31mERROR: Elemental runes exceeded the limit\e[0m\n";
+
+			if (elementalsCounter > MAX_ELEMENTALS) {
+				suspects[suspectIterator].ilegalSpells++;
+				printf("\n\e[0;31mERROR: [%s] Elemental runes counter exceeded the limit\e[0m\n", magicianName.c_str());
 			}
+
 			if (!isEnergeticRune) {
-				suspects[k].ilegalSpells++;
-				cout << "\n\e[0;31mERROR: Energetic runes exceeded the limit\e[0m\n";
+				suspects[suspectIterator].ilegalSpells++;
+				printf("\n\e[0;31mERROR: [%s] Energetic runes counter exceeded the limit\e[0m\n", magicianName.c_str());
 			}
 		}
 	}
@@ -162,29 +170,28 @@ void isSpellsValid(graph spells[], magician suspects[], int spellsQuantity, int 
 
 int main(int argc, char *argv[]) {
 	// Open spell and suspect files
-	ifstream spellFile = checkFile("../build/spellList.in");
-	ifstream suspectFile = checkFile("../build/underInvestigation.in");
+	ifstream spellsFile = checkFile("../build/spellList.in");
+	ifstream suspectsFile = checkFile("../build/underInvestigation.in");
 
 	// Get the list of suspects
 	magician* suspects = nullptr;
 	int suspectsQuantity = 0;
-	getSuspectsList(suspectFile, suspects, suspectsQuantity);
+	getSuspectsList(suspectsFile, suspects, suspectsQuantity);
 
 	// Get the list of spells
-    int spellsQuantity = getSpellsQuantity(spellFile);
-
+    int spellsQuantity = getSpellsQuantity(spellsFile);
     graph spells[spellsQuantity];
-    readSpellList(spellFile, spells, spellsQuantity);
+    readSpellList(spellsFile, spells, spellsQuantity);
 
 	// Check if the spells are valid duh
-	isSpellsValid(spells, suspects, spellsQuantity, suspectsQuantity);
+	getIlegalMagicians(spells, suspects, spellsQuantity, suspectsQuantity);
 
 	// Just debug stuff
-	printGraphs(spells, spellsQuantity);
+	//printGraphs(spells, spellsQuantity);
 	printSuspectThings(suspects, suspectsQuantity);
 
-    spellFile.close();
-    suspectFile.close();
+    spellsFile.close();
+    suspectsFile.close();
 
 	return 0;
 }
