@@ -84,7 +84,8 @@ void graph::addEdge(const int& from, const int& to, int weight) {
 // Method to print the graph
 void graph::print() {
     vertex* actualVertex = vertices;  // Start from the first vertex
-	printf("\nSuspect \e[0;34m%s\e[0m has the following connections:\n\n", suspectName.c_str());
+	printf("\n\e[0;34mGraph of the suspect %s\e[0m\n", suspectName.c_str());
+	printf("\e[0;34mSpell type: %s\e[0m\n", type.c_str());
 
     while (actualVertex) {
 		printf("\e[0;32mVertex %d\e[0m with type \e[0;32m%c\e[0m connects to:\n", actualVertex->value, actualVertex->type);
