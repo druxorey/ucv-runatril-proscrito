@@ -153,8 +153,9 @@ void getIlegalMagicians(graph spells[], magician suspects[], int spellsQuantity,
 
 	for (int spellIterator = 0; spellIterator < spellsQuantity; spellIterator++) {
 		int cofluencyCounter = 0, elementalsCounter = 0;
-		string magicianName = spells[spellIterator].name;
 		bool isEnergeticRune = true, isCatalidicRune = true;
+
+		string magicianName = spells[spellIterator].name;
 
 		checkSpellLegality(spells, spellIterator, cofluencyCounter, elementalsCounter, isEnergeticRune, isCatalidicRune);
 
