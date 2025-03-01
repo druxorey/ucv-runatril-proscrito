@@ -28,10 +28,12 @@ class graph {
     public:
         vertex* vertices;  // Pointer to the first vertex in the vertex list
 		string suspectName;  // Hes just Master Chief
+		string type;
 		int vertexQuantity;
+		bool vality;
 
         // Constructor to initialize an empty graph
-        graph() : vertices(nullptr), suspectName("Jhon"), vertexQuantity(0) {}
+        graph() : vertices(nullptr), suspectName("Jhon"), type("Wingardium Leviosa"), vertexQuantity(0), vality(true) {}
 
         void addVertex(const int& name, const char& type);
         void addEdge(const int& from, const int& to, int weight);
