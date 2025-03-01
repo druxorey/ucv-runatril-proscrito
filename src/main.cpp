@@ -61,17 +61,17 @@ int getSpellsQuantity(ifstream &file) {
 
 // Recursive function to get the list of suspects from the file (Yeah, I'm kind of a genius)
 void getSuspectsList(ifstream &file, magician* &suspects, int &suspectsQuantity, int index = 0) {
-    if (file.eof()) {
+	if (file.eof()) {
 		suspectsQuantity--;
-        suspects = new magician[suspectsQuantity];
-        return;
-    }
+		suspects = new magician[suspectsQuantity];
+		return;
+	}
 
-    string suspectLine;
-    getline(file, suspectLine);
-    suspectsQuantity++;
+	string suspectLine;
+	getline(file, suspectLine);
+	suspectsQuantity++;
 
-    getSuspectsList(file, suspects, suspectsQuantity, index + 1);
+	getSuspectsList(file, suspects, suspectsQuantity, index + 1);
 
 	if (index < suspectsQuantity) {
 		suspects[index].name = suspectLine;
@@ -84,28 +84,28 @@ void readSpellList(ifstream &file, graph spells[], int spellsQuantity) {
 	int vertexQuantity, edgesQuantity, from, to, weight;
 	char vertex;
 
-    for (int i = 0; i < spellsQuantity; ++i) {
-        getline(file, wizardName);
-		spells[i].suspectName = wizardName;
+	for (int i = 0; i < spellsQuantity; ++i) {
+		getline(file, wizardName);
+		spells[i].name = wizardName;
 
-        file >> vertexQuantity;
+		file >> vertexQuantity;
 		file.ignore(); // Shitty C++ getline bug [ actually it's not a bug, it's a feature :) ]
 		getline(file, vertexTypes);
 
-        for (int j = 0; j < vertexQuantity; ++j) {
+		for (int j = 0; j < vertexQuantity; ++j) {
 			vertex = (vertexTypes[j] != ' ')? vertexTypes[j]: '0'; // I asume that the vertex type is '0' if it's not specified
-            spells[i].addVertex(j + 1, vertex);
-        }
+			spells[i].addVertex(j + 1, vertex);
+		}
 
-        file >> edgesQuantity;
+		file >> edgesQuantity;
 		file.ignore();
 
-        for (int j = 0; j < edgesQuantity; ++j) {
-            file >> from >> to >> weight;
+		for (int j = 0; j < edgesQuantity; ++j) {
+			file >> from >> to >> weight;
 			file.ignore();
-            spells[i].addEdge(from, to, weight);
-        }
-    }
+			spells[i].addEdge(from, to, weight);
+		}
+	}
 }
 
 
@@ -153,7 +153,7 @@ void getIlegalMagicians(graph spells[], magician suspects[], int spellsQuantity,
 
 	for (int spellIterator = 0; spellIterator < spellsQuantity; spellIterator++) {
 		int cofluencyCounter = 0, elementalsCounter = 0;
-		string magicianName = spells[spellIterator].suspectName;
+		string magicianName = spells[spellIterator].name;
 		bool isEnergeticRune = true, isCatalidicRune = true;
 
 		checkSpellLegality(spells, spellIterator, cofluencyCounter, elementalsCounter, isEnergeticRune, isCatalidicRune);
@@ -200,9 +200,9 @@ int main(int argc, char *argv[]) {
 	getSuspectsList(suspectsFile, suspects, suspectsQuantity);
 
 	// Get the list of spells
-    int spellsQuantity = getSpellsQuantity(spellsFile);
-    graph spells[spellsQuantity];
-    readSpellList(spellsFile, spells, spellsQuantity);
+	int spellsQuantity = getSpellsQuantity(spellsFile);
+	graph spells[spellsQuantity];
+	readSpellList(spellsFile, spells, spellsQuantity);
 
 	// Check if the spells are valid duh
 	getIlegalMagicians(spells, suspects, spellsQuantity, suspectsQuantity);
@@ -211,8 +211,8 @@ int main(int argc, char *argv[]) {
 	printGraphs(spells, spellsQuantity);
 	printSuspectThings(suspects, suspectsQuantity);
 
-    spellsFile.close();
-    suspectsFile.close();
+	spellsFile.close();
+	suspectsFile.close();
 
 	return 0;
 }
