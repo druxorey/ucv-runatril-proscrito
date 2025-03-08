@@ -105,7 +105,46 @@ void readSpellList(ifstream &file, graph spells[], int spellsQuantity) {
 			file.ignore();
 			spells[i].addEdge(from, to, weight);
 		}
+	}	
+}	
+
+bool alreadyVisited(vertex* visited[], int n, vertex* actual){
+	for (int i = 0; i < n; i++){
+		if(visited[i]==actual){
+			return true;
+		}
 	}
+	return false;
+}
+
+
+int getBiggestCicle(vertex* visited[], graph spell, vertex* initial, vertex* actual, int count, int max, int vertexVisited=0){
+	if(actual==initial){
+		if(count!=0){
+			return count; //If the cicle is complete return
+		}
+	} else {
+		visited[vertexVisited]=actual;
+	}
+	edge* actEdge=actual->edgeList; //Get the edge list from the actual vertex
+	int aux;
+	while(actEdge!=nullptr){ //While the edge list hasnt finished
+		if(!alreadyVisited(visited, vertexVisited, spell.findVertex(actEdge->to))){ //Stops from going back and forth
+			aux = getBiggestCicle(visited, spell, initial, spell.findVertex(actEdge->to), count+1, max, vertexVisited+1); //Recursive call
+			if(max<aux){ //If the count of the recursive call is larger than current count replace it
+				max=aux;
+			}
+		}
+		actEdge=actEdge->next; //Go to the next edge in the list for the actual vertex
+	}
+	if(count>max) max=count; //If the current largest count is larger than the current max replace it
+	return max; //Return the max
+}
+
+
+int getBiggestCicle(graph spell){
+	vertex* visited[spell.vertexQuantity];
+	return getBiggestCicle(visited, spell, spell.vertices, spell.vertices, 0, 0);
 }
 
 
@@ -128,25 +167,25 @@ void checkSpellLegality(graph spells[], int spellIterator, int &cofluencyCounter
 			case 'B': break;
 			case 'D': break;
 			default: cout << "\n\e[0;31mSomething really bad happened, check your elementals runes...\e[0m\n"; break;
-		}
+		}	
 
 		if (lastElementalCounter < elementalsCounter) {
 			string adjacentTypes = spells[spellIterator].getAdjacentTypes(actualRune);
 			for (int adjacentIterator = 0; adjacentIterator < adjacentTypes.length(); adjacentIterator++) {
 				if (adjacentTypes[spellIterator] == 'D') isCatalidicRune = false;
-			}
-		}
+			}	
+		}	
 
 		if (actualRune->next != nullptr) actualRune = actualRune->next;
-	}
+	}	
 
 	string adjacentTypes = spells[spellIterator].getAdjacentTypes(actualRune);
 	for (int adjacentIterator = 0; adjacentIterator < adjacentTypes.length(); adjacentIterator++) {
 		if (adjacentTypes[spellIterator] != 'B') isEnergeticRune = false;
-	}
+	}	
 
 	if (elementalsCounter > 0) spells[spellIterator].type = type;
-}
+}	
 
 
 void getIlegalMagicians(graph spells[], magician suspects[], int spellsQuantity, int suspectsQuantity) {
@@ -184,6 +223,12 @@ void getIlegalMagicians(graph spells[], magician suspects[], int spellsQuantity,
 				suspects[suspectIterator].ilegalSpells++;
 				spells[spellIterator].vality = false;
 				printf("\n\e[0;31mERROR: [%s] Catalidic runes counter exceeded the limit\e[0m\n", magicianName.c_str());
+			}
+
+			if (!getBiggestCicle(spells[spellIterator])%2==0) {
+				suspects[suspectIterator].ilegalSpells++;
+				spells[spellIterator].vality = false;
+				printf("\n\e[0;31mERROR: [%s] Spell largest cicle is not even\e[0m\n", magicianName.c_str());
 			}
 		}
 	}

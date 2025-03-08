@@ -20,6 +20,8 @@ class vertex {
 		edge* edgeList;
 		vertex* next;  // Pointer to the next vertex in the vertex list
 
+        // Default constructor
+		vertex() : value(0), type(0), edgeList(nullptr), next(nullptr), adjacentVertex(0) {}
 		// Constructor to initialize a vertex with a name
 		vertex(int n, char t) : value(n), type(t), edgeList(nullptr), next(nullptr), adjacentVertex(0) {}
 };
@@ -39,8 +41,6 @@ class graph {
 		void addEdge(const int& from, const int& to, int weight);
 		string getAdjacentTypes(vertex* actualVertex);
 		void print();
-
-	private:
 		vertex* findVertex(const int& name);
 };
 
