@@ -29,13 +29,14 @@ class vertex {
 class graph {
 	public:
 		string name;  // Hes just Master Chief
+        string spellName;
 		string type;
 		bool vality;
 		int vertexQuantity;
 		vertex* vertices;  // Pointer to the first vertex in the vertex list
 
 		// Constructor to initialize an empty graph
-		graph() : vertices(nullptr), name("Jhon"), type("Arcano"), vertexQuantity(0), vality(true) {}
+		graph() : vertices(nullptr), name("Jhon"), spellName(""), type("Arcano"), vertexQuantity(0), vality(true) {}
 
 		void addVertex(const int& name, const char& type);
 		void addEdge(const int& from, const int& to, int weight);
