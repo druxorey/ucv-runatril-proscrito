@@ -122,6 +122,7 @@ void getSuspectsList(ifstream &file, magician* &suspects, int &suspectsQuantity,
 
 	if (index < suspectsQuantity) {
 		suspects[index].name = suspectLine;
+		suspects[index].ilegalSpells = 3;
 	}
 }
 
@@ -393,6 +394,8 @@ void writeProcessed(ofstream &file, graph spells[], int spellsQuantity){
 	{
 		file<<legal.begin()->spellName<<endl //Writes spell name
 			<<legal.begin()->name<<endl<<endl; //Writes magician name
+
+		legal.erase(legal.begin());
 	}
 	
 	file<<"Hechizos Ilegales"<<endl;
@@ -410,6 +413,17 @@ void writeProcessed(ofstream &file, graph spells[], int spellsQuantity){
 	{
 		file<<illegal.begin()->spellName<<endl //Writes spell name
 			<<illegal.begin()->name<<endl<<endl; //Writes magician name
+		
+		illegal.erase(legal.begin());
+	}
+}
+
+
+void writeSuspects(ofstream &file, magician suspects[], int suspectQuantity){
+	for (int i = 0; i < suspectQuantity; i++){
+		if(suspects[i].ilegalSpells>2){
+			file<<suspects[i].name<<endl;
+		}
 	}
 }
 
@@ -428,6 +442,9 @@ int main(int argc, char *argv[]) {
 	int spellsQuantity = getSpellsQuantity(spellsFile);
 	graph spells[spellsQuantity];
 	readSpellList(spellsFile, spells, spellsQuantity);
+	
+	spellsFile.close();
+	suspectsFile.close();
 
 	// Check if the spells are valid duh
 	getIlegalMagicians(spells, suspects, spellsQuantity, suspectsQuantity);
@@ -436,12 +453,15 @@ int main(int argc, char *argv[]) {
 	ofstream processedSpells("../build/processedSpells.out");
 	writeProcessed(processedSpells, spells, spellsQuantity);
 
+	//Update the suspects list
+	ofstream investigationFile("../build/underInvestigation.out");
+	writeSuspects(investigationFile, suspects, suspectsQuantity);
+
 	// Just debug stuff
 	printGraphs(spells, spellsQuantity);
 	printSuspectThings(suspects, suspectsQuantity);
 
-	spellsFile.close();
-	suspectsFile.close();
+	investigationFile.close();
 	processedSpells.close();
 
 	return 0;
