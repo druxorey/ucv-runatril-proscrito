@@ -22,38 +22,38 @@ public:
 
 	class iterator {
 	public:
-		iterator(node<datatype>* ptr = nullptr) : node(ptr) {}
+		iterator(node<datatype>* ptr = nullptr) : thisNode(ptr) {}
 
-		datatype& operator*() const { return node->payload; }
-		datatype* operator->() const { return &(node->payload); }
+		datatype& operator*() const { return thisNode->payload; }
+		datatype* operator->() const { return &(thisNode->payload); }
 
 		iterator& operator++() {
-			node = node->next;
+			thisNode = thisNode->next;
 			return *this;
 		}
 
 		iterator operator++(int) {
 			iterator temp = *this;
-			node = node->next;
+			thisNode = thisNode->next;
 			return temp;
 		}
 
 		iterator& operator--() {
-			node = node->prev;
+			thisNode = thisNode->prev;
 			return *this;
 		}
 
 		iterator operator--(int) {
 			iterator temp = *this;
-			node = node->prev;
+			thisNode = thisNode->prev;
 			return temp;
 		}
 
-		bool operator==(const iterator& other) const { return node == other.node; }
-		bool operator!=(const iterator& other) const { return node != other.node; }
+		bool operator==(const iterator& other) const { return thisNode == other.thisNode; }
+		bool operator!=(const iterator& other) const { return thisNode != other.thisNode; }
 
 	private:
-		node<datatype>* node;
+		node<datatype>* thisNode;
 		friend class list<datatype>;
 	};
 
@@ -118,7 +118,7 @@ typename list<datatype>::iterator list<datatype>::insert(iterator pos, const dat
 		return iterator(newNode);
 	}
 
-	node<datatype>* current = pos.node;
+	node<datatype>* current = pos.thisNode;
 
 	if (current == nullptr) {
 		newNode->prev = _last;
@@ -141,7 +141,7 @@ typename list<datatype>::iterator list<datatype>::insert(iterator pos, const dat
 
 template <typename datatype>
 void list<datatype>::erase(iterator pos) {
-	node<datatype>* current = pos.node;
+	node<datatype>* current = pos.thisNode;
 	if (current == nullptr) return;
 
 	_size--;
