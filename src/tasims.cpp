@@ -250,6 +250,7 @@ void checkSpellLegality(graph spells[], int spellIterator, int &cofluencyCounter
 	int lastElementalCounter = elementalsCounter;
 	string type;
 
+
 	for (int runeIterator = 0; runeIterator < spells[spellIterator].vertexQuantity; runeIterator++) {
 
 		switch (actualRune->type) {
@@ -264,28 +265,51 @@ void checkSpellLegality(graph spells[], int spellIterator, int &cofluencyCounter
 			case 'B': break;
 			case 'D': break;
 			default: cout << "\n\e[0;31mSomething really bad happened, check your elementals runes...\e[0m\n"; break;
-		}	
+		}
 
 		if (lastElementalCounter < elementalsCounter) {
 			string adjacentTypes = spells[spellIterator].getAdjacentTypes(actualRune);
 			for (int adjacentIterator = 0; adjacentIterator < adjacentTypes.length(); adjacentIterator++) {
 				if (adjacentTypes[spellIterator] == 'D') isCatalidicRune = false;
-			}	
-		}	
+			}
+		}
 
 		if (actualRune->next != nullptr) actualRune = actualRune->next;
-	}	
+	}
 
 	string adjacentTypes = spells[spellIterator].getAdjacentTypes(actualRune);
 	for (int adjacentIterator = 0; adjacentIterator < adjacentTypes.length(); adjacentIterator++) {
 		if (adjacentTypes[spellIterator] != 'B') isEnergeticRune = false;
-	}	
+	}
 
 	if (elementalsCounter > 0) spells[spellIterator].type = type;
-}	
+}
 
 
-void getIlegalMagicians(graph spells[], magician suspects[], int spellsQuantity, int suspectsQuantity) {
+void addSuspect(magician* &suspects, int &suspectsQuantity, const string &name) {
+	printf("\n\e[0;33mWARNING: [%s] is not in the list of suspects\e[0m\n", name.c_str());
+    // Create a new array with increased size
+    magician* newSuspects = new magician[suspectsQuantity + 1];
+
+    // Copy existing suspects to the new array
+    for (int i = 0; i < suspectsQuantity; ++i) {
+        newSuspects[i] = suspects[i];
+    }
+
+    // Add the new suspect
+    newSuspects[suspectsQuantity].name = name;
+    newSuspects[suspectsQuantity].ilegalSpells = 0;
+
+    // Update suspectsQuantity
+    suspectsQuantity++;
+
+    // Delete the old array and update the pointer
+    delete[] suspects;
+    suspects = newSuspects;
+}
+
+
+void getIlegalMagicians(graph spells[], magician* &suspects, int spellsQuantity, int &suspectsQuantity) {
 
 	for (int spellIterator = 0; spellIterator < spellsQuantity; spellIterator++) {
 		int cofluencyCounter = 0, elementalsCounter = 0;
@@ -296,9 +320,15 @@ void getIlegalMagicians(graph spells[], magician suspects[], int spellsQuantity,
 		checkSpellLegality(spells, spellIterator, cofluencyCounter, elementalsCounter, isEnergeticRune, isCatalidicRune);
 
 		for (int suspectIterator = 0; suspectIterator < suspectsQuantity; suspectIterator++) {
-			if (suspects[suspectIterator].name != magicianName) continue;
 
-			if (cofluencyCounter > MAX_COFLUENCY) {
+			if (suspects[suspectIterator].name != magicianName) {
+				if (suspectIterator == suspectsQuantity - 1) {
+					addSuspect(suspects, suspectsQuantity, magicianName);
+				}
+				continue;
+			}
+
+			if (cofluencyCounter > MAX_COFLUENCY || cofluencyCounter == 0) {
 				suspects[suspectIterator].ilegalSpells++;
 				spells[spellIterator].vality = false;
 				printf("\n\e[0;31mERROR: [%s] Cofluency counter exceeded the limit\e[0m\n", magicianName.c_str());
