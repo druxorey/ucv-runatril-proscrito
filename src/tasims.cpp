@@ -2,6 +2,7 @@
 #include <fstream>
 #include "../lib/graph.cpp"
 #include "../lib/list.cpp"
+#include "../lib/processed_list.cpp"
 
 using namespace std;
 
@@ -9,53 +10,8 @@ const short MAX_COFLUENCY = 1;
 const short MAX_ELEMENTALS = 3;
 
 struct magician {
-	string name = "Jhon";
+	string name = "Jhon"; // It's Master Chief's again???
 	int ilegalSpells = 0;
-};
-
-class processedList: public list<graph>{
-	public:
-		iterator arcane;
-		iterator fire;
-		iterator water;
-		iterator earth;
-		iterator wind;
-		iterator light;
-
-		void insertInOrder(graph spell){
-			string type=spell.type;
-
-			if(type=="Arcano"){
-				arcane=insert(arcane, spell);
-			}else if(type=="Ignatum"){
-				if(fire==nullptr){
-					fire==arcane;
-				}
-				fire=insert(fire, spell);
-			}else if(type=="Aquos"){
-				if(water==nullptr){
-					water==fire;
-				}
-				water=insert(water, spell);
-			}else if(type=="Terraminium"){
-				if(earth==nullptr){
-					earth=water;
-				}
-				earth=insert(earth, spell);
-			}else if(type=="Ventus"){
-				if(wind==nullptr){
-					wind=earth;
-				}
-				wind=insert(wind, spell);
-			}else if(type=="Lux"){
-				if(light==nullptr){
-					light=wind;
-				}
-				light=insert(light, spell);
-			}else{
-				push_back(spell);
-			}
-		}
 };
 
 
@@ -126,6 +82,29 @@ void getSuspectsList(ifstream &file, magician* &suspects, int &suspectsQuantity,
 	}
 }
 
+// Just because I'm a genius (I shouldn't have done it this way)
+void addSuspect(magician* &suspects, int &suspectsQuantity, const string &name) {
+	printf("\n\e[0;33mWARNING: [%s] is not in the list of suspects\e[0m\n", name.c_str());
+
+    // Create a new array with increased size
+    magician* newSuspects = new magician[suspectsQuantity + 1];
+
+    // Copy existing suspects to the new array
+    for (int i = 0; i < suspectsQuantity; ++i) {
+        newSuspects[i] = suspects[i];
+    }
+
+    // Add the new suspect
+    newSuspects[suspectsQuantity].name = name;
+    newSuspects[suspectsQuantity].ilegalSpells = 0;
+
+    suspectsQuantity++;
+
+    // Delete the old array and update the pointer (Do not check O complexity)
+    delete[] suspects;
+    suspects = newSuspects;
+}
+
 
 void readSpellList(ifstream &file, graph spells[], int spellsQuantity) {
 	string wizardName, vertexTypes;
@@ -153,93 +132,86 @@ void readSpellList(ifstream &file, graph spells[], int spellsQuantity) {
 			file.ignore();
 			spells[i].addEdge(from, to, weight);
 		}
-	}	
-}	
+	}
+}
 
-bool alreadyVisited(vertex* visited[], int n, vertex* actual){
-	for (int i = 0; i < n; i++){
-		if(visited[i]==actual){
-			return true;
-		}
+bool alreadyVisited(vertex* visited[], int n, vertex* actual) {
+	for (int i = 0; i < n; i++) {
+		if (visited[i] == actual) return true;
 	}
 	return false;
 }
 
 
-int getBiggestCicle(vertex* visited[], graph spell, vertex* initial, vertex* actual, int count, int max, int vertexVisited=0){
-	if(actual==initial){
-		if(count!=0){
-			return count; //If the cicle is complete return
-		}
+int checkBiggestCircle(vertex* visited[], graph spell, vertex* initial, vertex* actual, int count, int max, int vertexVisited=0) {
+	if (actual == initial) {
+		if (count!=0) return count; // If the cicle is complete return
 	} else {
-		visited[vertexVisited]=actual;
+		visited[vertexVisited] = actual;
 	}
 
-	edge* actEdge=actual->edgeList; //Get the edge list from the actual vertex
+	edge* actualEdge = actual->edgeList; // Get the edge list from the actual vertex
 	int aux;
 
-	while(actEdge!=nullptr){ //While the edge list hasnt finished
-		if(!alreadyVisited(visited, vertexVisited, spell.findVertex(actEdge->to))){ //Stops from going back and forth
-			aux = getBiggestCicle(visited, spell, initial, spell.findVertex(actEdge->to), count+1, max, vertexVisited+1); //Recursive call
-			if(max<aux){ //If the count of the recursive call is larger than current count replace it
-				max=aux;
-			}
+	while (actualEdge != nullptr) { // While the edge list hasnt finished
+		if (!alreadyVisited(visited, vertexVisited, spell.findVertex(actualEdge->to))) { // Stops from going back and forth
+			aux = checkBiggestCircle(visited, spell, initial, spell.findVertex(actualEdge->to), count+1, max, vertexVisited+1); // Recursive call
+			// If the count of the recursive call is larger than current count replace it
+			if(max < aux) max = aux;
 		}
-		actEdge=actEdge->next; //Go to the next edge in the list for the actual vertex
+		actualEdge = actualEdge->next; // Go to the next edge in the list for the actual vertex
 	}
-	if(count>max) max=count; //If the current largest count is larger than the current max replace it
+	if (count > max) max = count; // If the current largest count is larger than the current max replace it
 	
-	return max; //Return the max
+	return max;
 }
 
 
-int getBiggestCicle(graph spell){
-	vertex* visited[spell.vertexQuantity]; //Array to avoid repeating paths
-	return getBiggestCicle(visited, spell, spell.vertices, spell.vertices, 0, 0);
+int getBiggestCicle(graph spell) {
+	vertex* visited[spell.vertexQuantity]; // Array to avoid repeating paths
+	return checkBiggestCircle(visited, spell, spell.vertices, spell.vertices, 0, 0);
 }
 
 
-int getBiggestPath(vertex* visited[], graph spell, vertex* actual, int count, int max, int vertexVisited=0){
-	if(actual->type!='A'||actual->type!='B'){
-		if(count>max){
-			max=count;
-		}
+int checkBiggestPath(vertex* visited[], graph spell, vertex* actual, int count, int max, int vertexVisited = 0) {
+	if (actual->type != 'A' || actual->type != 'B') {
+		if (count > max) max = count;
 	}
 	
-	visited[vertexVisited]=actual; //Mark current vertex as already visited
+	visited[vertexVisited] = actual; // Mark current vertex as already visited
 	
-	edge* actEdge=actual->edgeList; //Get the edge list from the actual vertex
+	edge* actEdge = actual->edgeList; // Get the edge list from the actual vertex
 	int aux;
 	
-	while(actEdge!=nullptr){ //While the edge list hasnt finished
-		if(!alreadyVisited(visited, vertexVisited, spell.findVertex(actEdge->to))){ //Stops from going back and forth
-			count+=actEdge->weight;
-			aux = getBiggestPath(visited, spell, spell.findVertex(actEdge->to), count, max, vertexVisited+1); //Recursive call
-			if(max<aux){ //If the count of the recursive call is larger than current count replace it
-				max=aux;
-			}
+	while (actEdge != nullptr) { // While the edge list hasnt finished
+		if (!alreadyVisited(visited, vertexVisited, spell.findVertex(actEdge->to))) { // Stops from going back and forth
+			count += actEdge->weight;
+			aux = checkBiggestPath(visited, spell, spell.findVertex(actEdge->to), count, max, vertexVisited+1); // Recursive call
+			// If the count of the recursive call is larger than current count replace it
+			if (max < aux) max = aux;
 		}
-		actEdge=actEdge->next; //Go to the next edge in the list for the actual vertex
+		actEdge = actEdge->next; // Go to the next edge in the list for the actual vertex
 	}
-	if(count>max) max=count; //If the current largest count is larger than the current max replace it
+	if (count > max) max = count; // If the current largest count is larger than the current max replace it
 	
-	visited[vertexVisited] = nullptr; //Desmark current vertex as already visited
+	visited[vertexVisited] = nullptr; // Desmark current vertex as already visited
 
-	return max; //Return the max
+	return max;
 }
 
 
-int getBiggestPath(graph spell){
-	int max=0;
-	int aux=0;
-	vertex* visited[spell.vertexQuantity]; //Array to avoid repeating
-	vertex* actualRune=spell.vertices;
-	for(int i=0; i<spell.vertexQuantity; i++){ //In case an ilegal spell has more than one confluence points
-		if(actualRune->type=='A'){
-			aux=getBiggestPath(visited, spell, actualRune, 0, 0);
-			if(aux>max) max=aux;
+int getBiggestPath(graph spell) {
+	int max = 0;
+	int aux = 0;
+	vertex* visited[spell.vertexQuantity]; // Array to avoid repeating
+	vertex* actualRune = spell.vertices;
+
+	for(int i = 0; i < spell.vertexQuantity; i++) { // In case an ilegal spell has more than one confluence points
+		if(actualRune->type == 'A') {
+			aux = checkBiggestPath(visited, spell, actualRune, 0, 0);
+			if(aux > max) max = aux;
 		}
-		actualRune=actualRune->next;
+		actualRune = actualRune->next;
 	}
 	return max;
 }
@@ -283,29 +255,6 @@ void checkSpellLegality(graph spells[], int spellIterator, int &cofluencyCounter
 	}
 
 	if (elementalsCounter > 0) spells[spellIterator].type = type;
-}
-
-
-void addSuspect(magician* &suspects, int &suspectsQuantity, const string &name) {
-	printf("\n\e[0;33mWARNING: [%s] is not in the list of suspects\e[0m\n", name.c_str());
-    // Create a new array with increased size
-    magician* newSuspects = new magician[suspectsQuantity + 1];
-
-    // Copy existing suspects to the new array
-    for (int i = 0; i < suspectsQuantity; ++i) {
-        newSuspects[i] = suspects[i];
-    }
-
-    // Add the new suspect
-    newSuspects[suspectsQuantity].name = name;
-    newSuspects[suspectsQuantity].ilegalSpells = 0;
-
-    // Update suspectsQuantity
-    suspectsQuantity++;
-
-    // Delete the old array and update the pointer
-    delete[] suspects;
-    suspects = newSuspects;
 }
 
 
@@ -362,97 +311,97 @@ void getIlegalMagicians(graph spells[], magician* &suspects, int spellsQuantity,
 }
 
 
-string obtainLastName(string name){
+string obtainLastName(string name) {
 	string lastName;
-	int space=name.find(' '); //Finds the location of the first space in the string
-	lastName=name.substr(space+1); //Gets magcian last name
+	int space = name.find(' '); // Finds the location of the first space in the string
+	lastName = name.substr(space + 1); // Gets magcian last name
 
 	return lastName;
 }
 
 
-void nameSpell(graph spell, string &spellName, string magicianName){
-	if(spell.type!="Arcano"){
-		spellName+=spell.type+" "; //If spell is not arcane then add type as first word
+void nameSpell(graph spell, string &spellName, string magicianName) {
+	if (spell.type != "Arcano") {
+		spellName += spell.type + " "; // If spell is not arcane then add type as first word
 	}
 
-	string lastName=obtainLastName(magicianName); //Gets magician last name
-	char lastLetter=lastName.back(); //Gets last letter of the last name
+	string lastName = obtainLastName(magicianName); // Gets magician last name
+	char lastLetter = lastName.back(); // Gets last letter of the last name
 
-	lastName.pop_back(); //Removes last letter from the last name
+	lastName.pop_back(); // Removes last letter from the last name
 
-	if(lastLetter=='a'|| lastLetter=='e'|| lastLetter=='i'|| lastLetter=='o'|| lastLetter=='u'){
-		lastName+="ium "; //If the last letter is a vocal add "ium" at the end
-	}else{
-		lastName+="um "; //If the last letter is a consonant add "um" at the end
+	if (lastLetter == 'a' || lastLetter == 'e' || lastLetter == 'i' || lastLetter == 'o' || lastLetter == 'u') {
+		lastName += "ium "; // If the last letter is a vocal add "ium" at the end
+	} else {
+		lastName += "um "; // If the last letter is a consonant add "um" at the end
 	}
 
-	spellName+=lastName; //Add the modified last name to the spell name
+	spellName += lastName; // Add the modified last name to the spell name
 
-	int bigPath=getBiggestPath(spell); //Get largest path (By ponderation) of the spell
-	int bigCicle=getBiggestCicle(spell); //Get largest cicle (By edge number) of the spell
+	int bigPath = getBiggestPath(spell); // Get largest path (By ponderation) of the spell
+	int bigCicle = getBiggestCicle(spell); // Get largest cicle (By edge number) of the spell
 
-	if(bigPath==0 || bigCicle==0){
-		spellName+="Arcante"; //If spell doesnt have either largest path or cicle
-	}else{
-		if(bigCicle<bigPath){
-			spellName+="modicum";
-		}else{
-			spellName+="maximus";
+	if (bigPath == 0 || bigCicle == 0) {
+		spellName += "Arcante"; // If spell doesnt have either largest path or cicle
+	} else {
+		if (bigCicle < bigPath) {
+			spellName += "modicum";
+		} else {
+			spellName += "maximus";
 		}
 	}
 }
 
 
-void writeProcessed(ofstream &file, graph spells[], int spellsQuantity){
+void writeProcessed(ofstream &file, graph spells[], int spellsQuantity) {
 	processedList legal;
 	processedList illegal;
 	int n;
 	
-	file<<"Hechizos Legales"<<endl<<endl;
-	for (int spellIterator = 0; spellIterator < spellsQuantity; spellIterator++){
-		if(spells[spellIterator].vality){ //If spell is legal
-			string magicianName = spells[spellIterator].name; //Get magician name
+	file << "Hechizos Legales" << endl << endl;
+	for (int spellIterator = 0; spellIterator < spellsQuantity; spellIterator++) {
+		if (spells[spellIterator].vality) { // If spell is legal
+			string magicianName = spells[spellIterator].name; // Get magician name
 
-			nameSpell(spells[spellIterator], spells[spellIterator].spellName, magicianName); //Get spell correct name
+			nameSpell(spells[spellIterator], spells[spellIterator].spellName, magicianName); // Get spell correct name
 			
-			legal.insertInOrder(spells[spellIterator]);//Insert spells in order onto the list
+			legal.insertInOrder(spells[spellIterator]); // Insert spells in order onto the list
 		}
 	}
-	n=legal.size();
-	for (int i = 0; i < n; i++)
-	{
-		file<<legal.begin()->spellName<<endl //Writes spell name
-			<<legal.begin()->name<<endl<<endl; //Writes magician name
+	n = legal.size();
+	for (int i = 0; i < n; i++) {
+		file << legal.begin()->spellName << endl // Writes spell name
+			 << legal.begin()->name<< endl << endl; // Writes magician name
 
 		legal.erase(legal.begin());
 	}
 	
-	file<<"Hechizos Ilegales"<<endl;
-	for (int spellIterator = 0; spellIterator < spellsQuantity; spellIterator++){
-		if(!spells[spellIterator].vality){ //If spell is illegal
-			string magicianName = spells[spellIterator].name; //Get magician name
+	file << "Hechizos Ilegales" << endl;
+	for (int spellIterator = 0; spellIterator < spellsQuantity; spellIterator++) {
+		if(!spells[spellIterator].vality) { // If spell is illegal
+			string magicianName = spells[spellIterator].name; // Get magician name
 
-			nameSpell(spells[spellIterator], spells[spellIterator].spellName, magicianName); //Get spell correct name
+			nameSpell(spells[spellIterator], spells[spellIterator].spellName, magicianName); // Get spell correct name
 			
-			illegal.insertInOrder(spells[spellIterator]);//Insert spells in order onto the list
+			illegal.insertInOrder(spells[spellIterator]); // Insert spells in order onto the list
 		}
 	}
-	n=illegal.size();
-	for (int i = 0; i < n; i++)
-	{
-		file<<illegal.begin()->spellName<<endl //Writes spell name
-			<<illegal.begin()->name<<endl<<endl; //Writes magician name
+
+	n = illegal.size();
+
+	for (int i = 0; i < n; i++) {
+		file << illegal.begin()->spellName << endl // Writes spell name
+			 <<illegal.begin()->name << endl << endl; // Writes magician name
 		
 		illegal.erase(legal.begin());
 	}
 }
 
 
-void writeSuspects(ofstream &file, magician suspects[], int suspectQuantity){
-	for (int i = 0; i < suspectQuantity; i++){
-		if(suspects[i].ilegalSpells>2){
-			file<<suspects[i].name<<endl;
+void writeSuspects(ofstream &file, magician suspects[], int suspectQuantity) {
+	for (int i = 0; i < suspectQuantity; i++) {
+		if (suspects[i].ilegalSpells > 2) {
+			file << suspects[i].name << endl;
 		}
 	}
 }
@@ -483,7 +432,7 @@ int main(int argc, char *argv[]) {
 	ofstream processedSpells("../build/processedSpells.out");
 	writeProcessed(processedSpells, spells, spellsQuantity);
 
-	//Update the suspects list
+	// Update the suspects list
 	ofstream investigationFile("../build/underInvestigation.in");
 	writeSuspects(investigationFile, suspects, suspectsQuantity);
 
