@@ -454,7 +454,7 @@ int main(int argc, char *argv[]) {
 	writeProcessed(processedSpells, spells, spellsQuantity);
 
 	//Update the suspects list
-	ofstream investigationFile("../build/underInvestigation.out");
+	ofstream investigationFile("../build/underInvestigation.in");
 	writeSuspects(investigationFile, suspects, suspectsQuantity);
 
 	// Just debug stuff
