@@ -189,10 +189,10 @@ int checkBiggestPath(vertex* visited[], graph spell, vertex* actual, int count, 
 			aux = checkBiggestPath(visited, spell, spell.findVertex(actEdge->to), count, max, vertexVisited+1); // Recursive call
 			// If the count of the recursive call is larger than current count replace it
 			if (max < aux) max = aux;
+			count-= actEdge->weight;
 		}
 		actEdge = actEdge->next; // Go to the next edge in the list for the actual vertex
 	}
-	if (count > max) max = count; // If the current largest count is larger than the current max replace it
 	
 	visited[vertexVisited] = nullptr; // Desmark current vertex as already visited
 
@@ -281,30 +281,35 @@ void getIlegalMagicians(graph spells[], magician* &suspects, int spellsQuantity,
 				suspects[suspectIterator].ilegalSpells++;
 				spells[spellIterator].vality = false;
 				printf("\n\e[0;31mERROR: [%s] Cofluency counter exceeded the limit\e[0m\n", magicianName.c_str());
+				continue;
 			}
 
 			if (elementalsCounter > MAX_ELEMENTALS) {
 				suspects[suspectIterator].ilegalSpells++;
 				spells[spellIterator].vality = false;
 				printf("\n\e[0;31mERROR: [%s] Elemental runes counter exceeded the limit\e[0m\n", magicianName.c_str());
+				continue;
 			}
 
 			if (!isEnergeticRune) {
 				suspects[suspectIterator].ilegalSpells++;
 				spells[spellIterator].vality = false;
 				printf("\n\e[0;31mERROR: [%s] Energetic runes counter exceeded the limit\e[0m\n", magicianName.c_str());
+				continue;
 			}
 
 			if (!isCatalidicRune) {
 				suspects[suspectIterator].ilegalSpells++;
 				spells[spellIterator].vality = false;
 				printf("\n\e[0;31mERROR: [%s] Catalidic runes counter exceeded the limit\e[0m\n", magicianName.c_str());
+				continue;
 			}
 
-			if (!getBiggestCicle(spells[spellIterator])%2==0) {
+			if (!((getBiggestCicle(spells[spellIterator])%2)==0)) {
 				suspects[suspectIterator].ilegalSpells++;
 				spells[spellIterator].vality = false;
 				printf("\n\e[0;31mERROR: [%s] Spell largest cicle is not even\e[0m\n", magicianName.c_str());
+				continue;
 			}
 		}
 	}
