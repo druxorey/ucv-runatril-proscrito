@@ -251,7 +251,7 @@ void checkSpellLegality(graph spells[], int spellIterator, int &cofluencyCounter
 
 	string adjacentTypes = spells[spellIterator].getAdjacentTypes(actualRune);
 	for (int adjacentIterator = 0; adjacentIterator < adjacentTypes.length(); adjacentIterator++) {
-		if (adjacentTypes[spellIterator] != 'B') isEnergeticRune = false;
+		if (adjacentTypes[adjacentIterator] != 'B') isEnergeticRune = false;
 	}
 
 	if (elementalsCounter > 0) spells[spellIterator].type = type;
