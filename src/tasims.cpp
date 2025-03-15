@@ -202,8 +202,7 @@ int checkBiggestPath(vertex* visited[], graph spell, vertex* actual, int count, 
 
 
 int getBiggestPath(graph spell) {
-	int max = 0;
-	int aux = 0;
+	int max = 0, aux = 0;
 	vertex* visited[spell.vertexQuantity]; // Array to avoid repeating
 	vertex* actualRune = spell.vertices;
 
@@ -366,6 +365,7 @@ void writeProcessed(ofstream &file, graph spells[], int spellsQuantity) {
 	int n;
 	
 	file << "Hechizos Legales" << endl << endl;
+
 	for (int spellIterator = 0; spellIterator < spellsQuantity; spellIterator++) {
 		if (spells[spellIterator].vality) { // If spell is legal
 			string magicianName = spells[spellIterator].name; // Get magician name
@@ -375,7 +375,9 @@ void writeProcessed(ofstream &file, graph spells[], int spellsQuantity) {
 			legal.insertInOrder(spells[spellIterator]); // Insert spells in order onto the list
 		}
 	}
+
 	n = legal.size();
+
 	for (int i = 0; i < n; i++) {
 		file << legal.begin()->spellName << endl // Writes spell name
 			 << legal.begin()->name<< endl << endl; // Writes magician name
