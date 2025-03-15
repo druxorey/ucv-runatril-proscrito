@@ -135,6 +135,7 @@ void readSpellList(ifstream &file, graph spells[], int spellsQuantity) {
 	}
 }
 
+
 bool alreadyVisited(vertex* visited[], int n, vertex* actual) {
 	for (int i = 0; i < n; i++) {
 		if (visited[i] == actual) return true;
@@ -222,7 +223,6 @@ void checkSpellLegality(graph spells[], int spellIterator, int &cofluencyCounter
 	int lastElementalCounter = elementalsCounter;
 	string type;
 
-
 	for (int runeIterator = 0; runeIterator < spells[spellIterator].vertexQuantity; runeIterator++) {
 
 		switch (actualRune->type) {
@@ -246,12 +246,14 @@ void checkSpellLegality(graph spells[], int spellIterator, int &cofluencyCounter
 			}
 		}
 
-		if (actualRune->next != nullptr) actualRune = actualRune->next;
-	}
+		if (actualRune->type == 'A') {
+			string adjacentTypes = spells[spellIterator].getAdjacentTypes(actualRune);
+			for (int adjacentIterator = 0; adjacentIterator < adjacentTypes.length(); adjacentIterator++) {
+				if (adjacentTypes[adjacentIterator] != 'B') isEnergeticRune = false;
+			}
+		}
 
-	string adjacentTypes = spells[spellIterator].getAdjacentTypes(actualRune);
-	for (int adjacentIterator = 0; adjacentIterator < adjacentTypes.length(); adjacentIterator++) {
-		if (adjacentTypes[adjacentIterator] != 'B') isEnergeticRune = false;
+		if (actualRune->next != nullptr) actualRune = actualRune->next;
 	}
 
 	if (elementalsCounter > 0) spells[spellIterator].type = type;
